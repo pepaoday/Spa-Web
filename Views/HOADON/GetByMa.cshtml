@@ -1,0 +1,167 @@
+﻿@model DoAnPhanMem.Models.HOADON
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmi.cshtml";
+}
+
+
+<style>
+    .invoice {
+        font-family: Arial, sans-serif;
+        width: 100%;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .invoice-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .invoice-meta {
+        display: flex;
+        justify-content: space-around;
+    }
+
+
+    .customer-info, .employee-info, .discount-info {
+        flex-basis: 30%;
+        margin-right: 20px;
+    }
+
+    .details {
+        flex-grow: 1;
+    }
+
+    .items table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .items th, .items td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    .total {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+    }
+
+        .total p {
+            margin-bottom: 8px;
+        }
+
+    .invoice-title {
+        color: #333;
+    }
+</style>
+
+<div class="container">
+
+    <div>
+        <span>
+
+            <a href="/Admin/HoaDon">Quay lại</a>
+
+        </span>
+        <div class="text-center mt-4">
+            <button id="exportBtn" class="btn btn-primary">Xuất hóa đơn (PDF)</button>
+        </div>
+    </div>
+    <div class="invoice">
+        <div class="invoice-header">
+            <h2 class="invoice-title">Hóa đơn số: @Model.IDHOADON</h2>
+            <div class="invoice-meta">
+                <p><strong>Ngày:</strong> @Model.NGAY.ToString("yyyy-MM-dd")</p>
+                <p><strong>Giờ:</strong> @Model.GIO.ToString("hh\\:mm")</p>
+            </div>
+        </div>
+        <div class="invoice-body">
+            <div class="customer-info">
+                <h4>Thông tin khách hàng</h4>
+                <p><strong>Tên khách hàng:</strong> @Model.TENKH</p>
+                <p><strong>Số điện thoại:</strong> @Model.SODT</p>
+            </div>
+            <div class="employee-info">
+                <h4>Thông tin nhân viên</h4>
+                <p><strong>Tên nhân viên:</strong> @Model.TENNV</p>
+            </div>
+            <div class="discount-info">
+                <h4>Thông tin khuyến mãi</h4>
+                <p><strong>Mã khuyến mãi:</strong> @Model.MAKM</p>
+            </div>
+            <div class="details">
+                <h4>Chi tiết hóa đơn</h4>
+                <div class="items">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.HOADON_SP)
+                            {
+                                <tr>
+                                    <td>@item.SANPHAM.TENSP</td>
+                                    <td>@item.SOLUONG</td>
+                                    <td>@String.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", item.GIA) VND</td>
+                                    <td>@String.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", item.GIA * item.SOLUONG) VND</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="items">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Dịch vụ</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.HOADON_DV)
+                            {
+                                <tr>
+                                    <td>@item.DICHVU.TENDV</td>
+                                    <td>@item.SOLUONG</td>
+                                    <td>@String.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", item.GIA) VND</td>
+                                    <td>@String.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", item.GIA * item.SOLUONG) VND</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="total">
+                    <p><strong>Tổng giá trị hóa đơn:</strong> @String.Format(System.Globalization.CultureInfo.GetCultureInfo("vi-VN"), "{0:C0}", Model.TONGGIA) VND</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+<script>
+    document.getElementById('exportBtn').addEventListener('click', function () {
+        const invoiceElement = document.querySelector('.invoice');
+        html2pdf().from(invoiceElement).save();
+    });
+</script>
